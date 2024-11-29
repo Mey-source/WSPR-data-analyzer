@@ -1,4 +1,5 @@
 import os.path
+import numpy as np
 import maidenhead as mh
 from dataclasses import dataclass
 
@@ -11,9 +12,13 @@ fileName = None
 #data type vars
 whitespace = None
 dateTime = None
+gridArr = np.array([])
 #location vars
 myLat = 30.517990
 myLon = -97.734530
+#lonLat = []
+latArr = np.array([])
+lonArr = np.array([])
 
 #datatype struct
 @dataclass
@@ -256,8 +261,28 @@ def parseFile(fileData1):
     parsedInfo.misc = misc1       
     
 #converts grid to Longitude and Latitude
+#takes just grid loc
 def grid2Coord(gridVar):
-    pass
+    return mh.to_location(gridVar)
+
+#parse grids into an array
+def parseGrid(gridVar):
+    #loop + datatype var
+    i = 0
+    #array
+    locArr = np.array([])
+    temp = []
+    while i < len(gridVar):
+        if gridVar[i].isspace():
+            if temp:
+                locArr = np.append(locArr, "".join(temp))
+                temp = []
+        else:
+            temp.append(gridVar[i])
+        i += 1
+    if temp:
+        locArr = np.append(locArr, "".join(temp))
+    return locArr
     
 #----[main]----#
 
@@ -286,8 +311,18 @@ fileName = "wsprP.txt"
 fileData = takeInData()
 parseFile(fileData)
 print(parsedInfo.grid)
+gridArr = parseGrid(parsedInfo.grid)
+print(gridArr)
 
-
+#structure for conversion + push to vars
+#fix this shit
+a = 0
+lonLat = [None] * len(gridArr)
+while a < len(gridArr):
+    lonLat[a] = gridArr[a]
+    a = a + 1
+print(a)
+print(lonLat[2])
 
 
 
