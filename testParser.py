@@ -16,9 +16,6 @@ gridArr = np.array([])
 #location vars
 myLat = 30.517990
 myLon = -97.734530
-#lonLat = []
-latArr = np.array([])
-lonArr = np.array([])
 
 #datatype struct
 @dataclass
@@ -34,6 +31,14 @@ class parseData:
     misc: str
 
 parsedInfo = parseData(str, str, str, str, str, str, str, str, str)
+
+#long/latitude struct
+@dataclass
+class lat_lon:
+    latArr: np.array([])
+    lonArr: np.array([])
+    
+latlon = lat_lon(np.array([]), np.array([]))
 
 #func for taking in txt file data
 def takeInData():
@@ -284,6 +289,28 @@ def parseGrid(gridVar):
         locArr = np.append(locArr, "".join(temp))
     return locArr
     
+#conv input to array elements
+def lat_lon_conv(gridArr):
+    a = 0
+    lonLat = [None] * len(gridArr)
+    while a < len(gridArr):
+        lonLat[a] = gridArr[a]
+        a = a + 1
+    return lonLat
+
+#sorts latitude and longitude into arrays
+def lat_lon_sort(lat_lon_output):
+    b = len(lat_lon_output) * 2
+    c = 0
+    result = []
+    #get lat + lon
+    #this is broken
+    while c < len(lat_lon_output):
+        tempVar = mh.to_location(lat_lon_output[c])
+        result.append(tempVar)
+        c += 1
+    return result
+        
 #----[main]----#
 
 #check if valid file
@@ -316,15 +343,25 @@ print(gridArr)
 
 #structure for conversion + push to vars
 #fix this shit
-a = 0
-lonLat = [None] * len(gridArr)
-while a < len(gridArr):
-    lonLat[a] = gridArr[a]
-    a = a + 1
-print(a)
-print(lonLat[2])
+# a = 0
+# lonLat = [None] * len(gridArr)
+# while a < len(gridArr):
+#     lonLat[a] = gridArr[a]
+#     a = a + 1
+# print(a)
 
+latlon.latArr = np.append(latlon.latArr ,"hi")
+latlon.latArr = np.append(latlon.latArr ,"sigmna")
+latlon.latArr = np.append(latlon.latArr ,"dasf")
+print(latlon.latArr[0])
+print(latlon.latArr[1])
+print(latlon.latArr[2])
+hi = lat_lon_conv(gridArr)
 
-
+print(gridArr)
+print(hi[2])
+yeah = lat_lon_sort(hi)
+print(lat_lon_sort(hi))
+print(yeah[3])
 
     
