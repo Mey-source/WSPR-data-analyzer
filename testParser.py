@@ -1,4 +1,5 @@
 import os.path
+import math
 import numpy as np
 import maidenhead as mh
 from dataclasses import dataclass
@@ -16,6 +17,8 @@ gridArr = np.array([])
 #location vars
 myLat = 30.517990
 myLon = -97.734530
+distFrom = np.array([])
+R = 6378 # this is in km
 
 #datatype struct
 @dataclass
@@ -290,7 +293,7 @@ def parseGrid(gridVar):
     return locArr
     
 #conv input to array elements
-def lat_lon_conv(gridArr):
+def lat_lon_move(gridArr):
     a = 0
     lonLat = [None] * len(gridArr)
     while a < len(gridArr):
@@ -298,8 +301,9 @@ def lat_lon_conv(gridArr):
         a = a + 1
     return lonLat
 
-#sorts latitude and longitude into arrays
-def lat_lon_sort(lat_lon_output):
+#converts grids to lat/lon array
+def lat_lon_conv(lat_lon_output):
+    counter = 0
     b = len(lat_lon_output) * 2
     c = 0
     result = []
@@ -311,6 +315,54 @@ def lat_lon_sort(lat_lon_output):
         c += 1
     return result
         
+#sorts lat and lon into their own arrays
+def lat_lon_sort(conv_output):
+    latitude = []
+    longitude = []
+    
+    for pair in conv_output:
+        lat, lon = pair
+        latitude.append(lat)
+        longitude.append(lon)
+    print(latitude)
+    print(longitude)
+    latlon.latArr = latitude
+    latlon.lonArr = longitude
+    return latlon
+
+#calculate distance
+#cleaned up by bot lol
+def distCalc():
+    # Define the radius of Earth in kilometers
+    R = 6371  # Earth radius in kilometers
+    disArr = np.array([])
+    # Reference point (your coordinates)
+    myLat = 30.517990
+    myLon = -97.734530
+
+    # Convert myLat and myLon from degrees to radians
+    myLat = myLat * (math.pi / 180)
+    myLon = myLon * (math.pi / 180)
+
+    # Convert all latitudes and longitudes from degrees to radians
+    latlon.latArr = [lat * (math.pi / 180) for lat in latlon.latArr]
+    latlon.lonArr = [lon * (math.pi / 180) for lon in latlon.lonArr]
+
+    # Calculate distance for each coordinate in latlon
+    for i in range(len(latlon.latArr)):
+        # Calculate the differences in latitudes and longitudes
+        chanLat = latlon.latArr[i] - myLat
+        chanLon = latlon.lonArr[i] - myLon
+
+        # Haversine formula
+        a = math.sin(chanLat / 2) ** 2 + math.cos(myLat) * math.cos(latlon.latArr[i]) * math.sin(chanLon / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+        # Calculate distance
+        d = R * c
+        disArr = np.append(disArr, d)
+        print(f"Distance to point {i}: {d} km")
+    return disArr
 #----[main]----#
 
 #check if valid file
@@ -337,9 +389,9 @@ def lat_lon_sort(lat_lon_output):
 fileName = "wsprP.txt"
 fileData = takeInData()
 parseFile(fileData)
-print(parsedInfo.grid)
+# print(parsedInfo.grid)
 gridArr = parseGrid(parsedInfo.grid)
-print(gridArr)
+# print(gridArr)
 
 #structure for conversion + push to vars
 #fix this shit
@@ -353,15 +405,19 @@ print(gridArr)
 latlon.latArr = np.append(latlon.latArr ,"hi")
 latlon.latArr = np.append(latlon.latArr ,"sigmna")
 latlon.latArr = np.append(latlon.latArr ,"dasf")
-print(latlon.latArr[0])
-print(latlon.latArr[1])
-print(latlon.latArr[2])
-hi = lat_lon_conv(gridArr)
+# print(latlon.latArr[0])
+# print(latlon.latArr[1])
+# print(latlon.latArr[2])
+hi = lat_lon_move(gridArr)
 
-print(gridArr)
-print(hi[2])
-yeah = lat_lon_sort(hi)
-print(lat_lon_sort(hi))
-print(yeah[3])
-
+# print(gridArr)
+# print(hi[2])
+yeah = lat_lon_conv(hi)
+print(lat_lon_conv(hi))
+# print(lat_lon_sort(hi))
+# print(latlon.latArr)
+ugh = lat_lon_sort(yeah)
+print(ugh)
+jug = distCalc()
+print(jug[3])
     
